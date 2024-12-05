@@ -17,6 +17,7 @@ self.loadSettings = function() {
 
 self.generatePac = function(host, port) {
     const ips = [
+        '*.kancolle-server.com',
         '203.104.209.71',
         '203.104.209.87',
         '125.6.184.215',
