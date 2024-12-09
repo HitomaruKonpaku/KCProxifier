@@ -39,7 +39,8 @@ self.generatePac = function(host, port) {
         '203.104.209.55',
         '203.104.209.102'
     ];
-    const gadget = '203.104.209.7';
+    const gadget = 'w00g.kancolle-server.com';
+    //const gadget = '203.104.209.7';
 
     const ipsExp = ips.join('|');
     const pac = 'function FindProxyForURL(url, host) {\n'
