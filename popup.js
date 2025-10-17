@@ -14,7 +14,7 @@ self.loadSettings = function() {
         return data;
     }
     catch (error) {
-        console.log(`Error occurred while loading saved proxy settings.\n${error}`);
+        console.error(`Error occurred while loading saved proxy settings.`, error);
         return { _error_: error };
     }
 };
@@ -28,8 +28,8 @@ self.saveSettings = async function(host, port, enable) {
         byId('success').style.display = 'inline-block';
         setTimeout(() => byId('success').style.display = 'none', 3*1000);
     }
-    catch (err) {
-        console.err(`Error occurred while saving proxy settings.\n${err}`);
+    catch (error) {
+        console.error(`Error occurred while saving proxy settings.`, error);
     }
 };
 
