@@ -3,8 +3,10 @@
     console.log('KCProxifier: Loaded')
 
     let proxyHost = '127.0.0.1'
-    let proxyPort = 8080
+    let proxyPort = 8081
     let proxyEnable = true
+
+    let serverHost
 
     function logSettings() {
         console.warn({ proxyHost, proxyPort, proxyEnable })
@@ -32,23 +34,16 @@
 
     chrome.runtime.onMessage.addListener((msg) => {
         if (!msg)
-            console.log("KCProxifier: Received null message.")
+            console.log('KCProxifier: Received null message.')
         else if (msg.action === 'apply-proxy')
             applySettings(msg.host, msg.port, msg.enable)
         else
-            console.log("KCProxifier: Received unknown message: " + JSON.stringify(msg))
+            console.log('KCProxifier: Received unknown message: ' + JSON.stringify(msg))
     })
 
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
-            // console.debug(details)
-            console.log({ method: details.method, url: details.url })
-
-            if (!proxyEnable) {
-                return
-            }
-
-            if (details.method !== 'GET') {
+            if (!proxyEnable || details.method !== 'GET') {
                 return
             }
 
@@ -56,17 +51,49 @@
                 return
             }
 
+            console.log({ type: 'onBeforeRequest', method: details.method, url: details.url })
+
             const url = new URL(details.url)
             let redirectUrl = `${proxyHost}:${proxyPort}${url.pathname}${url.search}`
             if (!redirectUrl.includes('://')) {
                 redirectUrl = 'http://' + redirectUrl
             }
 
-            console.log({ redirectUrl })
+            if (!url.host.includes('w00g')) {
+                serverHost = url.host
+            }
+
             return { redirectUrl }
         },
         { urls: ['*://*.kancolle-server.com/*'] },
         ['blocking'],
+    )
+
+    chrome.webRequest.onBeforeRequest.addListener(
+        (details) => {
+            if (serverHost) {
+                if (details.url.includes('resources/world')) {
+                    const redirectUrl = details.url.replace(
+                        /\d{3}_\d{3}_\d{3}_\d{3}/,
+                        `${serverHost.split('.')[0].substring(1)}_ver_com`,
+                    )
+                    return { redirectUrl }
+                }
+            }
+        },
+        { urls: ['*://127.0.0.1/*'] },
+        ['blocking'],
+    )
+
+    chrome.webRequest.onBeforeSendHeaders.addListener(
+        (details) => {
+            if (serverHost) {
+                details.requestHeaders.push({ name: 'x-kcp-host', value: serverHost });
+                return { requestHeaders: details.requestHeaders }
+            }
+        },
+        { urls: ['*://127.0.0.1/*'] },
+        ['blocking', 'requestHeaders'],
     )
 
     loadSettings()
