@@ -13,7 +13,7 @@
     "webRequestBlocking",
     "https://play.games.dmm.com/game/kancolle",
     "*://*.kancolle-server.com/*",
-    "*://127.0.0.1/*"
+    "http://*/*"
   ],
   "background": {
     "scripts": [

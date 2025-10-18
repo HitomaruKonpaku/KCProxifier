@@ -81,7 +81,7 @@
                 }
             }
         },
-        { urls: ['*://127.0.0.1/*'] },
+        { urls: ['http://*/*'] },
         ['blocking'],
     )
 
@@ -92,7 +92,7 @@
                 return { requestHeaders: details.requestHeaders }
             }
         },
-        { urls: ['*://127.0.0.1/*'] },
+        { urls: ['http://*/*'] },
         ['blocking', 'requestHeaders'],
     )
 
