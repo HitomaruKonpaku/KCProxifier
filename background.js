@@ -78,7 +78,7 @@ chrome.runtime.onMessage.addListener(function (msg) {
     if (!msg)
         console.error("KCProxifier: Received null message.");
     else if (msg.action === 'apply-proxy')
-        applyProxy(msg.host, msg.port, msg.enable);
+        self.applyProxy();
     else
         console.error("KCProxifier: Received unknown message", msg);
 });
