@@ -9,8 +9,10 @@ self.loadSettings = function() {
         data.proxyHost = window.localStorage.getItem('proxyHost');
         data.proxyPort = window.localStorage.getItem('proxyPort');
         data.proxyEnable = window.localStorage.getItem('proxyEnable');
+        data.proxyMode = window.localStorage.getItem('proxyMode');
         if (!data.proxyHost) data.proxyHost = '127.0.0.1';
         if (!data.proxyPort) data.proxyPort = '8081';
+        if (!data.proxyMode) data.proxyMode = 'path'
         return data;
     }
     catch (error) {
@@ -19,12 +21,13 @@ self.loadSettings = function() {
     }
 };
 
-self.saveSettings = async function(host, port, enable) {
+self.saveSettings = async function(host, port, enable, mode) {
     try {
         window.localStorage.setItem('proxyHost', host);
         window.localStorage.setItem('proxyPort', port);
         window.localStorage.setItem('proxyEnable', enable);
-        self.applyProxy(host, port, enable);
+        window.localStorage.setItem('proxyMode', mode);
+        self.applyProxy(host, port, enable, mode);
         byId('success').style.display = 'inline-block';
         setTimeout(() => byId('success').style.display = 'none', 3*1000);
     }
@@ -33,8 +36,8 @@ self.saveSettings = async function(host, port, enable) {
     }
 };
 
-self.applyProxy = function(host, port, enable) {
-    const message = { action: 'apply-proxy', host, port, enable };
+self.applyProxy = function(host, port, enable, mode) {
+    const message = { action: 'apply-proxy', host, port, enable, mode };
     console.log("Sending message: " + JSON.stringify(message));
     chrome.runtime.sendMessage(message);
 }
@@ -45,11 +48,14 @@ self.initialize = function(viewModel) {
     byId('proxyhost').value = settings.proxyHost;
     byId('proxyport').value = settings.proxyPort;
     byId('proxyenable').checked = settings.proxyEnable == "true";
+    document.forms.proxyform.proxymode.value = settings.proxyMode;
+
     byId('save').addEventListener('click', async () => {
         const host = byId('proxyhost').value;
         const port = byId('proxyport').value;
         const enable = byId('proxyenable').checked;
-        await self.saveSettings(host, port, enable);
+        const mode = document.forms.proxyform.proxymode.value;
+        await self.saveSettings(host, port, enable, mode);
     });
 }
 document.addEventListener("DOMContentLoaded", () => self.initialize());
